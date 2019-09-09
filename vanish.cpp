@@ -164,6 +164,7 @@ int main()
     char *numHistLinesStr = (char*)malloc(sizeof(char)*histBuffSize);
     fgets(numHistLinesStr, histBuffSize, hist);  
     numHistLines = atoi(numHistLinesStr);
+    //cout<<"num history lines is "<<numHistLines<<"\n";
 
     /*
     struct termios term;
@@ -230,8 +231,12 @@ int main()
             char *tempPointer = (char*)malloc(sizeof(char)*histBuffSize);
             fgets(tempPointer, histBuffSize, hist);
         }
-        fprintf(hist, "%s\n",command);
-        cout<<"ok till here -- fprintf\n";
+        string cppcommand = command;
+        //fprintf(hist, "%s\n",cppcommand.c_str());
+        fputs(cppcommand.c_str(), hist);
+        //cout<<"going to write "<<cppcommand.c_str()<<"\n";
+        fputs("\n",hist);
+        //cout<<"ok till here -- fprintf\n";
         ++numHistLines;
 
         int numTokens = 0;
@@ -469,14 +474,14 @@ int main()
                 rootMode = false;
                 setenv("PS1","$",1);
             }
-            cout<<"ok till here\n";
             fclose(hist);
             FILE *histUpdate = fopen("history.txt", "w");
             numHistLinesStr = (char*)to_string(numHistLines).c_str();
             fputs(numHistLinesStr, histUpdate);
             fclose(histUpdate);
-            free(command);
+
             return 0;
+            //cout<<"ok till here\n";
         }
         else if(checkThisInTokens(">"))
         {
