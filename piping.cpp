@@ -27,7 +27,7 @@ void piping(int currentPipe, int numCommands, int (*pipePtr)[2], bool first, boo
     pipeFD[currentPipe][0] = pipePtr[currentPipe][0];
     pipeFD[currentPipe+1][1] = pipePtr[currentPipe+1][1];
 
-    cout<<"in the parent piping, read end = "<<pipeFD[currentPipe][0]<<" and write end = "<<pipeFD[currentPipe+1][1]<<"\n";
+    //cout<<"in the parent piping, read end = "<<pipeFD[currentPipe][0]<<" and write end = "<<pipeFD[currentPipe+1][1]<<"\n";
     
     pid_t childPid = fork();
     if(childPid > 0)
@@ -36,25 +36,27 @@ void piping(int currentPipe, int numCommands, int (*pipePtr)[2], bool first, boo
 
         //int childStatus;
         //pid_t waitRet = wait(childStatus);
-        cout<<"I'm now waiting for child "<<childPid<<"\n";
+        //cout<<"I'm now waiting for child "<<childPid<<"\n";
         if(first) close(pipeFD[currentPipe][0]);
         //if(first) close(pipeFD[currentPipe][1]);
         if(currentPipe+1 < numCommands) close(pipeFD[currentPipe+1][1]);    //close write end of next
 
         pid_t waitRet = waitpid(childPid, &childStatus, WUNTRACED);
-        cout<<"I'm done waiting for child "<<waitRet<<" its exit status is "<<childStatus<<"\n";
+        //cout<<"I'm done waiting for child "<<waitRet<<" its exit status is "<<childStatus<<"\n";
         /*
         cout<<"waitRet is "<<waitRet<<"\n";
         cout<<"childpid is "<<childPid<<"\n";
         */
 
+        /*
         if(waitRet != childPid)
         {
             //cout<<"Could not execute command: "<<commandWords[0]<<endl;
             cout<<"Could not execute command\n";
         }
+        */
 
-        cout<<"child's execution done\n";
+        //cout<<"child's execution done\n";
     }
     else if(childPid == 0)
     {
@@ -98,12 +100,13 @@ void piping(int currentPipe, int numCommands, int (*pipePtr)[2], bool first, boo
             exit(EXIT_FAILURE);
         }
 
-        cout<<"The command being processed now from child "<<getpid()<<" is "<<commandWordZ[0]<<"\n";
+        //cout<<"The command being processed now from child "<<getpid()<<" is "<<commandWordZ[0]<<"\n";
+        /*
         if(commandWordZ[1] == NULL)
         {
             cout<<"commandWordZ[1] is NULL\n";
         }
-
+        */
         int exitStat = execvp(commandWordZ[0],commandWordZ);
         //cout<<"exitstat from child is "<<exitStat<<"\n";
 

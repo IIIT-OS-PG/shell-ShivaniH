@@ -46,7 +46,8 @@ void envSetup(string &prompt, map<string, vector<string>> &mapRef, map<string, s
     FILE *vanishrc = fopen(".vanishrc", "r+");
     vector<string> envVars;
     char line[500];
-    while (1) {
+    while (1) 
+    {
         if (fgets(line, 500, vanishrc) == NULL) break;
         envVars.push_back(line);
     }
@@ -144,6 +145,9 @@ int main()
     map<string, string> mulMed;
     map<string, string> &mulMedRef = mulMed;
 
+    map<string, string> alarmies;
+    map<string, string> &alarmRef = alarmies;
+
     string oldPWD = "";  
 
     envSetup(promptRef, akaRef, mulMedRef);
@@ -152,6 +156,14 @@ int main()
     int &childRef = childStatus;
 
     bool rootMode = false;
+
+    FILE *hist = fopen("history.txt","r+");
+    int histBuffSize = atoi(getenv("HISTSIZE"))+1;
+    //cout<<"histBuff limit is "<<histBuffSize<<"\n";
+    int numHistLines;
+    char *numHistLinesStr = (char*)malloc(sizeof(char)*histBuffSize);
+    fgets(numHistLinesStr, histBuffSize, hist);  
+    numHistLines = atoi(numHistLinesStr);
 
     /*
     struct termios term;
@@ -209,6 +221,18 @@ int main()
         }
         command[index] = '\0';
         //cout<<"Really took the input\n";
+
+        //fputs(command, hist);
+        if(numHistLines >= histBuffSize-1)
+        {
+            fclose(hist);
+            hist = fopen("history.txt", "w");
+            char *tempPointer = (char*)malloc(sizeof(char)*histBuffSize);
+            fgets(tempPointer, histBuffSize, hist);
+        }
+        fprintf(hist, "%s\n",command);
+        cout<<"ok till here -- fprintf\n";
+        ++numHistLines;
 
         int numTokens = 0;
         int &ref = numTokens;
@@ -445,6 +469,13 @@ int main()
                 rootMode = false;
                 setenv("PS1","$",1);
             }
+            cout<<"ok till here\n";
+            fclose(hist);
+            FILE *histUpdate = fopen("history.txt", "w");
+            numHistLinesStr = (char*)to_string(numHistLines).c_str();
+            fputs(numHistLinesStr, histUpdate);
+            fclose(histUpdate);
+            free(command);
             return 0;
         }
         else if(checkThisInTokens(">"))
@@ -505,7 +536,7 @@ int main()
             for(i = 0; i < numCommands; ++i)
             {
                 pipe(pipeFD[i]);
-                cout<<"pipe[0] =  "<<pipeFD[i][0]<<" pipe[1] = "<<pipeFD[i][1]<<"\n";
+                //cout<<"pipe[0] =  "<<pipeFD[i][0]<<" pipe[1] = "<<pipeFD[i][1]<<"\n";
             }
 
             //int (&piperef)[][2] = pipeFD;
@@ -538,9 +569,9 @@ int main()
             last = true;
             commandWords[k] = NULL;
             k = 0;
-            cout<<"I'm gonna call piping for "<<commandWords[0]<<" now\n";
+            //cout<<"I'm gonna call piping for "<<commandWords[0]<<" now\n";
             piping(j, numCommands, pipePtr ,first, last, childRef);
-            cout<<"I'm out, bye bye\n";
+            //cout<<"I'm out, bye bye\n";
         }
         else {
             /*----------------------------------------------------------------------------------------------------------------------------------------
@@ -616,5 +647,11 @@ int main()
         free(command);
         fflush(stdout);
     }
+    fclose(hist);
+    FILE *histUpdate = fopen("history.txt", "w");
+    numHistLinesStr = (char*)to_string(numHistLines).c_str();
+    fputs(numHistLinesStr, histUpdate);
+    fclose(histUpdate);
+
     return 0;
 }

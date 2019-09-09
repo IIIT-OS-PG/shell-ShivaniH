@@ -11,3 +11,4 @@ MEDIA = [gedit, /bin/gedit, .hpp]
 MEDIA = [vlc, /bin/vlc, .mp4]
 MEDIA = [vlc, /bin/vlc, .mp3]
 MEDIA = [libreoffice, /bin/libreoffice, .odt]
+HISTSIZE = 200
